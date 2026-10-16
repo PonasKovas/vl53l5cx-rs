@@ -1,0 +1,33 @@
+[package]
+name = "vl53l5cx-rs"
+version = "0.1.0"
+edition = "2021"
+description = "Safe no_std driver for the ST VL53L5CX multizone ToF sensor"
+license = "BSD-3-Clause"
+
+[dependencies]
+vl53l5cx-sys = { path = "../vl53l5cx-sys", default-features = false }
+embedded-hal = "1.0"
+defmt = { version = "1", optional = true }
+
+[features]
+default = [
+    "ambient-per-spad",
+    "nb-target-detected",
+    "signal-per-spad",
+    "distance-mm",
+    "reflectance-percent",
+    "target-status",
+]
+ambient-per-spad = ["vl53l5cx-sys/ambient-per-spad"]
+nb-spads-enabled = ["vl53l5cx-sys/nb-spads-enabled"]
+nb-target-detected = ["vl53l5cx-sys/nb-target-detected"]
+signal-per-spad = ["vl53l5cx-sys/signal-per-spad"]
+range-sigma-mm = ["vl53l5cx-sys/range-sigma-mm"]
+distance-mm = ["vl53l5cx-sys/distance-mm"]
+reflectance-percent = ["vl53l5cx-sys/reflectance-percent"]
+target-status = ["vl53l5cx-sys/target-status"]
+targets-2 = ["vl53l5cx-sys/targets-2"]
+targets-3 = ["vl53l5cx-sys/targets-3"]
+targets-4 = ["vl53l5cx-sys/targets-4"]
+defmt = ["dep:defmt"]
