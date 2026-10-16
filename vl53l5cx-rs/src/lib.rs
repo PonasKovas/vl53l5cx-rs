@@ -6,7 +6,37 @@
 //!
 //! Power/reset pins (LPn, I2C_RST) are left to the caller: have the sensor
 //! powered with LPn high before calling [`Vl53l5cx::init`].
+//!
+//! ## Feature Flags
+//!
+//! ### Measurement Outputs
+//! Disabling unused outputs reduces I2C transfer sizes and sensor memory footprint.
+//! - `distance-mm` *(default)*: Target distance in millimeters.
+//! - `target-status` *(default)*: Measurement validity status per target (5 and 9 indicate valid range).
+//! - `signal-per-spad` *(default)*: Returned signal rate in kcps/SPAD.
+//! - `ambient-per-spad` *(default)*: Ambient noise rate in kcps/SPAD.
+//! - `nb-target-detected` *(default)*: Number of detected targets in each zone.
+//! - `reflectance-percent` *(default)*: Estimated target reflectance percentage.
+//! - `range-sigma-mm`: Standard deviation (sigma) of distance measurement in millimeters.
+//! - `nb-spads-enabled`: Number of active SPADs for each zone.
+//!
+//! ### Targets per Zone
+//! Maximum targets tracked per zone (default is 1). Choose at most one:
+//! - `targets-2`: Up to 2 targets per zone.
+//! - `targets-3`: Up to 3 targets per zone.
+//! - `targets-4`: Up to 4 targets per zone.
+//!
+//! ### ST Plugins
+//! Optional firmware plugins compiled into the driver:
+//! - `xtalk`: Crosstalk calibration routines and margin configuration.
+//! - `detection-thresholds`: Programmable per-zone detection thresholds and interrupts.
+//! - `motion-indicator`: Motion detection indicator across zones.
+//! - `plugins`: Convenience flag enabling `xtalk`, `detection-thresholds`, and `motion-indicator`.
+//!
+//! ### Other
+//! - `defmt`: Derives `defmt::Format` on public data types and errors.
 #![no_std]
+#![feature(doc_cfg)]
 
 mod driver;
 mod error;
@@ -20,8 +50,10 @@ pub use driver::{Ranging, Ready, Uninit, Vl53l5cx};
 pub use error::Error;
 pub use results::Results;
 #[cfg(feature = "motion-indicator")]
+#[doc(cfg(feature = "motion-indicator"))]
 pub use results::MotionIndicator;
 #[cfg(feature = "detection-thresholds")]
+#[doc(cfg(feature = "detection-thresholds"))]
 pub use thresholds::{
     DetectionThreshold, DetectionThresholds, Measurement, Operation, WindowType,
     MAX_THRESHOLDS,
@@ -44,4 +76,5 @@ pub const TARGETS_PER_ZONE: usize = if cfg!(feature = "targets-4") {
 
 /// Size of the crosstalk calibration blob.
 #[cfg(feature = "xtalk")]
+#[doc(cfg(feature = "xtalk"))]
 pub const XTALK_DATA_SIZE: usize = vl53l5cx_sys::VL53L5CX_XTALK_BUFFER_SIZE;

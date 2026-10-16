@@ -252,6 +252,7 @@ impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Ranging> {
 
 // ------------------------------------------------------- plugin: xtalk
 #[cfg(feature = "xtalk")]
+#[doc(cfg(feature = "xtalk"))]
 impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Ready> {
     /// Run crosstalk calibration (do it before ranging, with a flat target in
     /// the full field of view). `reflectance_percent` 1..=99 (ST recommends
@@ -302,6 +303,7 @@ impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Ready> {
 
 // ------------------------------------------- plugin: detection thresholds
 #[cfg(feature = "detection-thresholds")]
+#[doc(cfg(feature = "detection-thresholds"))]
 impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Ready> {
     pub fn detection_thresholds_enabled(&mut self) -> Result<bool, Error<I2C::Error>> {
         let mut v = 0u8;
@@ -351,6 +353,7 @@ impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Ready> {
 
 // ------------------------------------------- plugin: motion indicator
 #[cfg(feature = "motion-indicator")]
+#[doc(cfg(feature = "motion-indicator"))]
 impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Ready> {
     /// Initialise the motion indicator for a resolution. Call before
     /// `start_ranging`.

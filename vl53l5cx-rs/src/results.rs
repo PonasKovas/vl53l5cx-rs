@@ -31,48 +31,56 @@ impl<'a> Results<'a> {
 
     /// Distance in mm.
     #[cfg(feature = "distance-mm")]
+    #[doc(cfg(feature = "distance-mm"))]
     pub fn distance_mm(&self, zone: usize, target: usize) -> Option<i16> {
         self.zt(zone, target).map(|i| self.data.distance_mm[i])
     }
 
     /// Validity of the measurement; 5 and 9 mean the range is OK.
     #[cfg(feature = "target-status")]
+    #[doc(cfg(feature = "target-status"))]
     pub fn target_status(&self, zone: usize, target: usize) -> Option<u8> {
         self.zt(zone, target).map(|i| self.data.target_status[i])
     }
 
     /// Returned signal in kcps/spad.
     #[cfg(feature = "signal-per-spad")]
+    #[doc(cfg(feature = "signal-per-spad"))]
     pub fn signal_per_spad(&self, zone: usize, target: usize) -> Option<u32> {
         self.zt(zone, target).map(|i| self.data.signal_per_spad[i])
     }
 
     /// Estimated reflectance in percent.
     #[cfg(feature = "reflectance-percent")]
+    #[doc(cfg(feature = "reflectance-percent"))]
     pub fn reflectance_percent(&self, zone: usize, target: usize) -> Option<u8> {
         self.zt(zone, target).map(|i| self.data.reflectance[i])
     }
 
     /// Sigma of the distance in mm.
     #[cfg(feature = "range-sigma-mm")]
+    #[doc(cfg(feature = "range-sigma-mm"))]
     pub fn range_sigma_mm(&self, zone: usize, target: usize) -> Option<u16> {
         self.zt(zone, target).map(|i| self.data.range_sigma_mm[i])
     }
 
     /// Ambient noise in kcps/spad.
     #[cfg(feature = "ambient-per-spad")]
+    #[doc(cfg(feature = "ambient-per-spad"))]
     pub fn ambient_per_spad(&self, zone: usize) -> Option<u32> {
         self.z(zone).map(|i| self.data.ambient_per_spad[i])
     }
 
     /// Number of valid targets detected in the zone.
     #[cfg(feature = "nb-target-detected")]
+    #[doc(cfg(feature = "nb-target-detected"))]
     pub fn nb_target_detected(&self, zone: usize) -> Option<u8> {
         self.z(zone).map(|i| self.data.nb_target_detected[i])
     }
 
     /// Number of SPADs enabled for the zone.
     #[cfg(feature = "nb-spads-enabled")]
+    #[doc(cfg(feature = "nb-spads-enabled"))]
     pub fn nb_spads_enabled(&self, zone: usize) -> Option<u32> {
         self.z(zone).map(|i| self.data.nb_spads_enabled[i])
     }
@@ -80,6 +88,7 @@ impl<'a> Results<'a> {
 
 /// Motion indicator output of a frame.
 #[cfg(feature = "motion-indicator")]
+#[doc(cfg(feature = "motion-indicator"))]
 #[derive(Debug, Clone, Copy)]
 pub struct MotionIndicator<'a> {
     pub global_indicator_1: u32,
@@ -92,6 +101,7 @@ pub struct MotionIndicator<'a> {
 }
 
 #[cfg(feature = "motion-indicator")]
+#[doc(cfg(feature = "motion-indicator"))]
 impl<'a> Results<'a> {
     pub fn motion_indicator(&self) -> MotionIndicator<'a> {
         let m = &self.data.motion_indicator;

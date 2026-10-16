@@ -1,9 +1,11 @@
 use vl53l5cx_sys as sys;
 
 /// Maximum number of checkers the sensor holds.
+#[doc(cfg(feature = "detection-thresholds"))]
 pub const MAX_THRESHOLDS: usize = sys::VL53L5CX_NB_THRESHOLDS;
 
 /// What a checker measures. Units of `low`/`high` follow the measurement.
+#[doc(cfg(feature = "detection-thresholds"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Measurement {
@@ -46,6 +48,7 @@ impl Measurement {
 }
 
 /// How `low`/`high` are compared with the measurement.
+#[doc(cfg(feature = "detection-thresholds"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum WindowType {
@@ -83,6 +86,7 @@ impl WindowType {
 
 /// How a checker combines with the previous one in the same zone. The first
 /// checker must be `Or`.
+#[doc(cfg(feature = "detection-thresholds"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Operation {
@@ -107,6 +111,7 @@ impl Operation {
 }
 
 /// One detection checker.
+#[doc(cfg(feature = "detection-thresholds"))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct DetectionThreshold {
@@ -142,6 +147,7 @@ const FILLER: DetectionThreshold = DetectionThreshold {
 };
 
 /// Checkers read back from the sensor.
+#[doc(cfg(feature = "detection-thresholds"))]
 pub struct DetectionThresholds {
     items: [DetectionThreshold; MAX_THRESHOLDS],
     len: usize,
