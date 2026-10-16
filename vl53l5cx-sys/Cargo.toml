@@ -27,6 +27,10 @@ range-sigma-mm = []
 distance-mm = []
 reflectance-percent = []
 target-status = []
+# ST plugins (extra C sources, compiled only when enabled).
+xtalk = []
+detection-thresholds = []
+motion-indicator = []
 # VL53L5CX_NB_TARGET_PER_ZONE (default 1). Highest enabled wins.
 targets-2 = []
 targets-3 = []

@@ -12,6 +12,13 @@ const OUTPUTS: &[&str] = &[
     "TARGET_STATUS",
 ];
 
+// Plugin feature `foo-bar` <-> compiled source file.
+const PLUGINS: &[(&str, &str)] = &[
+    ("XTALK", "vl53l5cx_plugin_xtalk.c"),
+    ("DETECTION_THRESHOLDS", "vl53l5cx_plugin_detection_thresholds.c"),
+    ("MOTION_INDICATOR", "vl53l5cx_plugin_motion_indicator.c"),
+];
+
 fn main() {
     let dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     let include = dir.join("include");
@@ -26,8 +33,10 @@ fn main() {
             defines.push((format!("VL53L5CX_DISABLE_{out}"), None));
         }
     }
-    // Motion indicator is a plugin; not part of core.
-    defines.push(("VL53L5CX_DISABLE_MOTION_INDICATOR".into(), None));
+    // The motion indicator output only exists with its plugin.
+    if !feature("MOTION_INDICATOR") {
+        defines.push(("VL53L5CX_DISABLE_MOTION_INDICATOR".into(), None));
+    }
 
     let targets = if feature("TARGETS_4") {
         4
@@ -51,6 +60,14 @@ fn main() {
         .include(&include)
         .include(&vendor)
         .warnings(false);
+    // Tells wrapper.h which plugin headers to expose to bindgen.
+    let mut plugin_defs: Vec<String> = Vec::new();
+    for (name, file) in PLUGINS {
+        if feature(name) {
+            build.file(vendor.join(file));
+            plugin_defs.push(format!("-DVL53L5CX_RS_{name}"));
+        }
+    }
     for (k, v) in &defines {
         build.define(k, v.as_deref());
     }
@@ -61,12 +78,14 @@ fn main() {
         .clang_arg(format!("-I{}", include.display()))
         .clang_arg(format!("-I{}", vendor.display()))
         .clang_arg("-ffreestanding")
+        .clang_arg("-DVL53L5CX_RS_BINDGEN")
         .clang_arg(format!("--target={}", env::var("TARGET").unwrap()))
         .use_core()
         .ctypes_prefix("core::ffi")
         .layout_tests(false)
         .allowlist_function("vl53l5cx_.*")
-        .allowlist_type("VL53L5CX_(Configuration|ResultsData)")
+        .allowlist_type("VL53L5CX_(Configuration|ResultsData|Motion_Configuration|DetectionThresholds)")
+        .clang_args(&plugin_defs)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()));
     for (k, v) in &defines {
         bg = bg.clang_arg(match v {

@@ -12,11 +12,20 @@ mod driver;
 mod error;
 mod platform;
 mod results;
+#[cfg(feature = "detection-thresholds")]
+mod thresholds;
 mod types;
 
 pub use driver::{Ranging, Ready, Uninit, Vl53l5cx};
 pub use error::Error;
 pub use results::Results;
+#[cfg(feature = "motion-indicator")]
+pub use results::MotionIndicator;
+#[cfg(feature = "detection-thresholds")]
+pub use thresholds::{
+    DetectionThreshold, DetectionThresholds, Measurement, Operation, WindowType,
+    MAX_THRESHOLDS,
+};
 pub use types::{PowerMode, RangingMode, Resolution, TargetOrder};
 
 /// Default 7-bit I2C address (ST's 8-bit 0x52).
@@ -32,3 +41,7 @@ pub const TARGETS_PER_ZONE: usize = if cfg!(feature = "targets-4") {
 } else {
     1
 };
+
+/// Size of the crosstalk calibration blob.
+#[cfg(feature = "xtalk")]
+pub const XTALK_DATA_SIZE: usize = vl53l5cx_sys::VL53L5CX_XTALK_BUFFER_SIZE;

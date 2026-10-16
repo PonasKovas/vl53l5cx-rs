@@ -8,6 +8,10 @@
 #pragma once
 
 #include <stdint.h>
+#ifndef VL53L5CX_RS_BINDGEN
+/* ST's plugin sources rely on platform.h pulling this in. */
+#include <string.h>
+#endif
 
 /* All callbacks return 0 on success, non-zero on failure.
  * addr is the 7-bit I2C address. reg is the 16-bit register, sent big-endian. */

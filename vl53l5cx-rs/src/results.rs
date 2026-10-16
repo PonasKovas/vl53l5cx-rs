@@ -77,3 +77,31 @@ impl<'a> Results<'a> {
         self.z(zone).map(|i| self.data.nb_spads_enabled[i])
     }
 }
+
+/// Motion indicator output of a frame.
+#[cfg(feature = "motion-indicator")]
+#[derive(Debug, Clone, Copy)]
+pub struct MotionIndicator<'a> {
+    pub global_indicator_1: u32,
+    pub global_indicator_2: u32,
+    pub status: u8,
+    pub nb_of_detected_aggregates: u8,
+    pub nb_of_aggregates: u8,
+    /// Per-aggregate motion values.
+    pub motion: &'a [u32; 32],
+}
+
+#[cfg(feature = "motion-indicator")]
+impl<'a> Results<'a> {
+    pub fn motion_indicator(&self) -> MotionIndicator<'a> {
+        let m = &self.data.motion_indicator;
+        MotionIndicator {
+            global_indicator_1: m.global_indicator_1,
+            global_indicator_2: m.global_indicator_2,
+            status: m.status,
+            nb_of_detected_aggregates: m.nb_of_detected_aggregates,
+            nb_of_aggregates: m.nb_of_aggregates,
+            motion: &m.motion,
+        }
+    }
+}
