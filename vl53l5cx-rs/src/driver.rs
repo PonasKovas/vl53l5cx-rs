@@ -99,7 +99,11 @@ impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Uninit> {
         dev.platform.write = Some(platform::write_cb::<I2C, D>);
         dev.platform.wait_ms = Some(platform::wait_cb::<I2C, D>);
         Self {
-            bus: Bus { i2c, delay, error: None },
+            bus: Bus {
+                i2c,
+                delay,
+                error: None,
+            },
             dev,
             results: unsafe { mem::zeroed() },
             zones: 0,
@@ -202,9 +206,7 @@ impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Ready> {
         self.call(|dev| unsafe { sys::vl53l5cx_set_power_mode(dev, mode.raw()) })
     }
 
-    pub fn start_ranging(
-        mut self,
-    ) -> Result<Vl53l5cx<I2C, D, Ranging>, (Self, Error<I2C::Error>)> {
+    pub fn start_ranging(mut self) -> Result<Vl53l5cx<I2C, D, Ranging>, (Self, Error<I2C::Error>)> {
         let res = match self.resolution() {
             Ok(r) => r,
             Err(e) => return Err((self, e)),
@@ -231,8 +233,7 @@ impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Ranging> {
     /// Read the latest frame. Call after `check_data_ready` returned true.
     pub fn get_ranging_data(&mut self) -> Result<Results<'_>, Error<I2C::Error>> {
         self.begin();
-        let status =
-            unsafe { sys::vl53l5cx_get_ranging_data(&mut self.dev, &mut self.results) };
+        let status = unsafe { sys::vl53l5cx_get_ranging_data(&mut self.dev, &mut self.results) };
         self.finish(status)?;
         Ok(Results {
             data: &self.results,
@@ -240,9 +241,7 @@ impl<I2C: I2c, D: DelayNs> Vl53l5cx<I2C, D, Ranging> {
         })
     }
 
-    pub fn stop_ranging(
-        mut self,
-    ) -> Result<Vl53l5cx<I2C, D, Ready>, (Self, Error<I2C::Error>)> {
+    pub fn stop_ranging(mut self) -> Result<Vl53l5cx<I2C, D, Ready>, (Self, Error<I2C::Error>)> {
         match self.call(|dev| unsafe { sys::vl53l5cx_stop_ranging(dev) }) {
             Ok(()) => Ok(self.cast()),
             Err(e) => Err((self, e)),

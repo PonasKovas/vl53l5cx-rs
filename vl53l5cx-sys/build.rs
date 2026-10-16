@@ -15,7 +15,10 @@ const OUTPUTS: &[&str] = &[
 // Plugin feature `foo-bar` <-> compiled source file.
 const PLUGINS: &[(&str, &str)] = &[
     ("XTALK", "vl53l5cx_plugin_xtalk.c"),
-    ("DETECTION_THRESHOLDS", "vl53l5cx_plugin_detection_thresholds.c"),
+    (
+        "DETECTION_THRESHOLDS",
+        "vl53l5cx_plugin_detection_thresholds.c",
+    ),
     ("MOTION_INDICATOR", "vl53l5cx_plugin_motion_indicator.c"),
 ];
 
@@ -84,7 +87,9 @@ fn main() {
         .ctypes_prefix("core::ffi")
         .layout_tests(false)
         .allowlist_function("vl53l5cx_.*")
-        .allowlist_type("VL53L5CX_(Configuration|ResultsData|Motion_Configuration|DetectionThresholds)")
+        .allowlist_type(
+            "VL53L5CX_(Configuration|ResultsData|Motion_Configuration|DetectionThresholds)",
+        )
         .clang_args(&plugin_defs)
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()));
     for (k, v) in &defines {

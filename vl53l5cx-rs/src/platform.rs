@@ -49,10 +49,10 @@ pub(crate) unsafe extern "C" fn write_cb<I2C: I2c, D: DelayNs>(
     }
     let buf = core::slice::from_raw_parts(buf, len as usize);
     // Two consecutive writes are sent as one transfer (no copy, no restart).
-    match bus
-        .i2c
-        .transaction(addr, &mut [Operation::Write(&reg.to_be_bytes()), Operation::Write(buf)])
-    {
+    match bus.i2c.transaction(
+        addr,
+        &mut [Operation::Write(&reg.to_be_bytes()), Operation::Write(buf)],
+    ) {
         Ok(()) => 0,
         Err(e) => {
             bus.error = Some(e);

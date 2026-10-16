@@ -48,15 +48,14 @@ mod types;
 
 pub use driver::{Ranging, Ready, Uninit, Vl53l5cx};
 pub use error::Error;
-pub use results::Results;
 #[cfg(feature = "motion-indicator")]
 #[doc(cfg(feature = "motion-indicator"))]
 pub use results::MotionIndicator;
+pub use results::Results;
 #[cfg(feature = "detection-thresholds")]
 #[doc(cfg(feature = "detection-thresholds"))]
 pub use thresholds::{
-    DetectionThreshold, DetectionThresholds, Measurement, Operation, WindowType,
-    MAX_THRESHOLDS,
+    DetectionThreshold, DetectionThresholds, Measurement, Operation, WindowType, MAX_THRESHOLDS,
 };
 pub use types::{PowerMode, RangingMode, Resolution, TargetOrder};
 
