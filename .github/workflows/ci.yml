@@ -1,0 +1,83 @@
+name: CI & Documentation
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+# Ensure only one deployment runs at a time
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ARM GCC & system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi clang libclang-dev
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: thumbv7em-none-eabihf
+          components: rust-docs
+
+      - name: Cache Cargo dependencies & build output
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ runner.os }}-cargo-thumbv7em
+
+      - name: Build with all features
+        run: cargo build --workspace --all-features --target thumbv7em-none-eabihf
+
+      - name: Build documentation
+        env:
+          RUSTDOCFLAGS: "--cfg docsrs"
+        run: cargo doc --workspace --all-features --no-deps --target thumbv7em-none-eabihf
+
+      - name: Prepare documentation for GitHub Pages
+        run: |
+          DOCS_DIR="target/thumbv7em-none-eabihf/doc"
+          # Prevent GitHub Pages from ignoring files beginning with underscores
+          touch "$DOCS_DIR/.nojekyll"
+          # Create root redirect to the main crate documentation
+          cat << 'EOF' > "$DOCS_DIR/index.html"
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta http-equiv="refresh" content="0; url=vl53l5cx_rs/index.html">
+            </head>
+            <body>
+              <p>Redirecting to <a href="vl53l5cx_rs/index.html">vl53l5cx_rs documentation</a>...</p>
+            </body>
+          </html>
+          EOF
+
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/thumbv7em-none-eabihf/doc
+
+  deploy-pages:
+    name: Deploy to GitHub Pages
+    needs: build-and-doc
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
